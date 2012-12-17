@@ -12,7 +12,7 @@
 
 @implementation me_riodoro1AppDelegate
 
-int64_t systemIdleTime(void) {
+int64_t systemIdleTime(void) {  //This function I got from the internet
     int64_t idlesecs = -1;
     io_iterator_t iter = 0;
     if (IOServiceGetMatchingServices(kIOMasterPortDefault, IOServiceMatching("IOHIDSystem"), &iter) == KERN_SUCCESS) {
