@@ -59,8 +59,7 @@ int64_t systemIdleTime(void) {  //This function I got from the internet
     NSInteger pwSource = [self getPowerSource];     //1 for AC, 0 for Battery
     NSDictionary* dict = [NSMutableDictionary dictionaryWithContentsOfFile:@"/Library/Preferences/SystemConfiguration/com.apple.PowerManagement.plist"];
     NSInteger sleep;
-    
-    
+    NSInteger criticalBatt = 10;
     
     if (pwSource) sleep = [[dict valueForKeyPath:@"Custom Profile.AC Power.System Sleep Timer"]integerValue];
     else sleep = [[dict valueForKeyPath:@"Custom Profile.Battery Power.System Sleep Timer"]integerValue];
@@ -68,7 +67,14 @@ int64_t systemIdleTime(void) {  //This function I got from the internet
     
     //NSLog(@"Chcking with idle time: %llds, sleep timer %lds display state: %ld power source: %ld",idle,sleep,disp,pwSource);
     
-    if(batt <=10 && !pwSource)                                        //Cheking safe sleep
+    if([dict valueForKeyPath:@"Custom Profile.Battery Power.Critical Battery Level"]!=NULL)
+    {
+        criticalBatt=[[dict valueForKeyPath:@"Custom Profile.Battery Power.Critical Battery Level"]integerValue];
+        //NSLog(@"assuming overriden value for critical battery level which is now: %ld",criticalBatt);
+    }
+    
+    
+    if(batt <= criticalBatt && !pwSource)                                        //Cheking safe sleep
     {
         NSLog(@"Safe sleeping the computer!");
         NSAppleScript *script = [[NSAppleScript alloc] initWithSource:@"tell application \"System Events\" to sleep"];
