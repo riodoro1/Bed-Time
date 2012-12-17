@@ -59,13 +59,16 @@ int64_t systemIdleTime(void) {  //This function I got from the internet
     NSInteger pwSource = [self getPowerSource];     //1 for AC, 0 for Battery
     NSDictionary* dict = [NSMutableDictionary dictionaryWithContentsOfFile:@"/Library/Preferences/SystemConfiguration/com.apple.PowerManagement.plist"];
     NSInteger sleep;
+    
+    
+    
     if (pwSource) sleep = [[dict valueForKeyPath:@"Custom Profile.AC Power.System Sleep Timer"]integerValue];
     else sleep = [[dict valueForKeyPath:@"Custom Profile.Battery Power.System Sleep Timer"]integerValue];
     sleep*=60;
     
     //NSLog(@"Chcking with idle time: %llds, sleep timer %lds display state: %ld power source: %ld",idle,sleep,disp,pwSource);
     
-    if(batt <=3)                                        //Cheking safe sleep
+    if(batt <=10 && !pwSource)                                        //Cheking safe sleep
     {
         NSLog(@"Safe sleeping the computer!");
         NSAppleScript *script = [[NSAppleScript alloc] initWithSource:@"tell application \"System Events\" to sleep"];
