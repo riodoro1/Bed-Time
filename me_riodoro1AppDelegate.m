@@ -12,6 +12,8 @@
 
 @implementation me_riodoro1AppDelegate
 
+bool safeSleeped;
+
 int64_t systemIdleTime(void) {  //This function I got from the internet
     int64_t idlesecs = -1;
     io_iterator_t iter = 0;
@@ -49,6 +51,7 @@ int64_t systemIdleTime(void) {  //This function I got from the internet
                                    selector:@selector(check:)
                                    userInfo:nil
                                     repeats:YES];
+    safeSleeped = FALSE;
 }
 
 -(IBAction)check:(id)sender
@@ -74,8 +77,9 @@ int64_t systemIdleTime(void) {  //This function I got from the internet
     }
     
     
-    if(batt <= criticalBatt && !pwSource)                                        //Cheking safe sleep
+    if(batt <= criticalBatt && !pwSource && !safeSleeped)                                        //Cheking safe sleep
     {
+        safeSleeped=TRUE;
         NSLog(@"Safe sleeping the computer!");
         NSAppleScript *script = [[NSAppleScript alloc] initWithSource:@"tell application \"System Events\" to sleep"];
         [script executeAndReturnError:nil];
@@ -104,6 +108,7 @@ int64_t systemIdleTime(void) {  //This function I got from the internet
     if(systemIdleTime()>7)
     {
         NSLog(@"Time passed, sleeping...");
+        safeSleeped=FALSE;
         NSAppleScript *script = [[NSAppleScript alloc] initWithSource:@"tell application \"System Events\" to sleep"];
         [script executeAndReturnError:nil];
         [script release];
